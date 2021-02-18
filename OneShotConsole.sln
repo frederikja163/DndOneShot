@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiscordBot", "DiscordBot\DiscordBot.csproj", "{F4BF92DF-B61A-4E7B-B666-6F899E159273}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Common\Common.csproj", "{F14D2854-C7D0-4353-8C10-BCB4BF60CAFE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApplicationLogic", "ApplicationLogic\ApplicationLogic.csproj", "{2672C806-EAA6-49D0-B6D3-EB96471AC96B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F4BF92DF-B61A-4E7B-B666-6F899E159273}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F4BF92DF-B61A-4E7B-B666-6F899E159273}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F4BF92DF-B61A-4E7B-B666-6F899E159273}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F4BF92DF-B61A-4E7B-B666-6F899E159273}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F14D2854-C7D0-4353-8C10-BCB4BF60CAFE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F14D2854-C7D0-4353-8C10-BCB4BF60CAFE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F14D2854-C7D0-4353-8C10-BCB4BF60CAFE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F14D2854-C7D0-4353-8C10-BCB4BF60CAFE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2672C806-EAA6-49D0-B6D3-EB96471AC96B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2672C806-EAA6-49D0-B6D3-EB96471AC96B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2672C806-EAA6-49D0-B6D3-EB96471AC96B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2672C806-EAA6-49D0-B6D3-EB96471AC96B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

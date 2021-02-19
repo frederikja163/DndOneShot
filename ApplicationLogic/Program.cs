@@ -10,6 +10,8 @@ namespace ApplicationLogic
         {
             var key = File.ReadAllText("key.txt");
             using var bot = new DiscordBot(key);
+            var players = bot.GetPlayers();
+            
             Console.ReadKey();
         }
     }

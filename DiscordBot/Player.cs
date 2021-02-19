@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Common;
 using Discord;
@@ -14,12 +15,18 @@ namespace DiscordServer
         private readonly IUserMessage _message;
         private PlayerData _data;
 
-        public Player(SocketGuildUser user, ITextChannel channel, IUserMessage message)
+        public Player(SocketGuildUser user, ITextChannel channel)
         {
             _user = user;
             _channel = channel;
-            _message = message;
 
+
+            var pins = channel.GetPinnedMessagesAsync().Result;
+            if ((_message = pins.FirstOrDefault() as IUserMessage) == null)
+            {
+                _message = channel.SendMessageAsync(embed: BuildEmbed(new PlayerData())).Result;
+                _message.PinAsync();
+            }
             
             var json = _message.Embeds.First().Fields[0].Value[8..^3];
             Data = JsonConvert.DeserializeObject<PlayerData>(json);
@@ -31,20 +38,42 @@ namespace DiscordServer
             set
             {
                 _data = value;
-                
+                _message.ModifyAsync(properties => properties.Embed = BuildEmbed(_data));
             }
         }
 
-        public event Action<string> OnMessageRecieved;
+        public event Func<IPlayer, string, bool> OnMessageRecieved;
         
-        public void SendMessage(Language language, string message)
+        public void SendMessageRaw(string message)
         {
             _channel.SendMessageAsync(message);
         }
 
-        internal void MessageRecieved(string message)
+        internal bool MessageRecieved(string message)
         {
-            OnMessageRecieved?.Invoke(message);
+            return OnMessageRecieved?.Invoke(this, message) ?? false;
+        }
+
+        private Embed BuildEmbed(PlayerData data)
+        {
+            var jsonField = "```json\n" + JsonConvert.SerializeObject(data, Formatting.Indented) + "\n```";
+            var builder = new EmbedBuilder()
+            {
+                Title = "Player Character",
+                // Author = new EmbedAuthorBuilder(){Name = "The book"},
+                Color = Color.Blue,
+                Description = "This is a template to put your character into.",
+                Fields = new List<EmbedFieldBuilder>()
+                {
+                    new EmbedFieldBuilder()
+                    {
+                        IsInline = false,
+                        Name = "Json",
+                        Value = jsonField,
+                    }
+                },
+            };
+            return builder.Build();
         }
     }
 }

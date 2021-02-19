@@ -22,7 +22,7 @@ namespace DiscordServer
         private SocketGuild _guild;
         private Player[] _players;
         private SocketCategoryChannel _categoryChannel;
-        private Dictionary<ulong, Player> _channelIdToPlayer;
+        private Dictionary<ulong, Player> _channelIdToPlayer = new Dictionary<ulong, Player>();
 
         public DiscordBot(string key)
         {
@@ -40,26 +40,7 @@ namespace DiscordServer
 
             IReadOnlyCollection<SocketGuildUser> sockets;
             while ((sockets = _guild.Users).Count <= 1) Thread.Sleep(1);
-            
-            
-            var defaultPlayerData = "```json\n" + JsonConvert.SerializeObject(new PlayerData(), Formatting.Indented) + "\n```";
-            var defaultPin = new EmbedBuilder()
-            {
-                Title = "Player Character",
-                // Author = new EmbedAuthorBuilder(){Name = "The book"},
-                Color = Color.Blue,
-                Description = "This is a template to put your character into.",
-                Fields = new List<EmbedFieldBuilder>()
-                {
-                    new EmbedFieldBuilder()
-                    {
-                        IsInline = false,
-                        Name = "Json",
-                        Value = defaultPlayerData,
-                    }
-                },
-            };
-            
+
             _players = sockets.Where(user => user.Roles.Any(role => role.Id == RoleId))
                 .Select(user =>
                 {
@@ -70,14 +51,9 @@ namespace DiscordServer
                             properties => properties.CategoryId = CategoryId).Result;
                         channel.AddPermissionOverwriteAsync(user, new OverwritePermissions(viewChannel: PermValue.Allow, sendMessages: PermValue.Allow));
                     }
-
-                    var pins = channel.GetPinnedMessagesAsync().Result;
-                    if (pins.FirstOrDefault(p => p.Author.Id == _bot.CurrentUser.Id) is not IUserMessage message)
-                    {
-                        message = channel.SendMessageAsync(embed: defaultPin.Build()).Result;
-                        message.PinAsync();
-                    }
-                    return new Player(user, channel, message);
+                    var player = new Player(user, channel);
+                    _channelIdToPlayer.Add(channel.Id, player);
+                    return player;
                 }).ToArray();
             SetStatus(UserStatus.Online, "Working");
         }
@@ -102,11 +78,14 @@ namespace DiscordServer
                     systemMessage.DeleteAsync();
                 }
             }
-            else if (socketMessage is SocketUserMessage userMessage)
+            else if (socketMessage is SocketUserMessage userMessage && userMessage.Author.Id != _bot.CurrentUser.Id)
             {
                 if (_channelIdToPlayer.TryGetValue(userMessage.Channel.Id, out var player))
                 {
-                    player.MessageRecieved(userMessage.Content);
+                    if (player.MessageRecieved(userMessage.Content))
+                    {
+                        userMessage.DeleteAsync();
+                    }
                 }
             }
             return Task.CompletedTask;

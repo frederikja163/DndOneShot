@@ -1,30 +1,42 @@
 
+using System;
+using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
 namespace Common
 {
-    public record PlayerData
+    public record PlayerData(string Name = "Name")
     {
         
         [JsonProperty(ItemConverterType = typeof(StringEnumConverter))]
-        public Language[] Languages { get; } = new[] {Language.Common, Language.Elvish, Language.Dwarvish};
-        public string Name { get; } = "Name";
+        public Language[] Languages { get; init; } = new[] {Language.Common, Language.Elvish, Language.Dwarvish};
 
-        public PlayerData(){}
-        
         [JsonConstructor]
-        public PlayerData(Language[] languages, string name)
+        public PlayerData(Language[] languages) : this()
         {
             Languages = languages;
-            Name = name;
         }
     }
 
     public interface IPlayer
     {
         public PlayerData Data { get; set; }
-        
-        public void SendMessage(Language language, string message);
+
+        public event Func<IPlayer, string, bool> OnMessageRecieved;
+
+        public void SendMessage(Language language, string message)
+        {
+            if (!Data.Languages.Contains(language))
+            {
+                SendMessageRaw(Utility.ConvertToJibberish(message));
+            }
+            else
+            {
+                SendMessageRaw(message);
+            }
+        }
+
+        public void SendMessageRaw(string message);
     }
 }
